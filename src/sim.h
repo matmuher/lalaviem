@@ -4,8 +4,8 @@
 #define SIM_Y_SIZE 64
 
 // [Colors]
-#define SPRING 0xFF00FF00
-#define OLD_SPRING 0xFF002200
+#define GREEN 0xFF00FF00
+#define DARK_GREEN 0xFF006600
 #define BRANCH 0xffCD853F
 
 // [Interface]
