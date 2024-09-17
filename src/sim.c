@@ -7,9 +7,11 @@
 
 #define FRAME_TICKS 50
 #define RAND_MAX 2147483647
+#define SEED 52U
 #define DEF_R 0
 #define DEF_G 40
 #define DEF_B 0
+#define DEF_A 255
 
 static SDL_Renderer *Renderer = NULL;
 static SDL_Window *Window = NULL;
@@ -20,9 +22,9 @@ void simInit()
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(SIM_X_SIZE * CELL_SIZE, SIM_Y_SIZE * CELL_SIZE,
         0, &Window, &Renderer);
-    SDL_SetRenderDrawColor(Renderer, DEF_R, DEF_G, DEF_B, 255);
+    SDL_SetRenderDrawColor(Renderer, DEF_R, DEF_G, DEF_B, DEF_A);
     SDL_RenderClear(Renderer);
-    srand(52U);
+    srand(SEED);
     simFlush();
 }
 
@@ -33,17 +35,16 @@ static void processEvents()
 
     if (event.type == SDL_KEYDOWN &&
         event.key.keysym.sym == SDLK_ESCAPE) {
+        SDL_DestroyRenderer(Renderer);
+        SDL_DestroyWindow(Window);
+        SDL_Quit();
         exit(0);
     }    
 }
 
 void simExit()
 {
-    SDL_Event event;
     while (1) {processEvents();}
-    SDL_DestroyRenderer(Renderer);
-    SDL_DestroyWindow(Window);
-    SDL_Quit();
 }
 
 typedef struct {
@@ -125,9 +126,9 @@ static Color hexToColor(int argb)
     return color;
 }
 
-void simPutPixel(int user_x, int user_y, int argb)
+void simPutPixel(int x, int y, int argb)
 {    
-    Point point = mapCoords(user_x, user_y);
+    Point point = mapCoords(x, y);
     Color color = hexToColor(argb);
 
     SDL_SetRenderDrawColor(Renderer,color.r, color.g, color.b, color.a);
@@ -145,31 +146,36 @@ void simPutPixel(int user_x, int user_y, int argb)
     writeBuffer[point.y * SIM_X_SIZE + point.x].color = argb;
 }
 
-void simPutLength(int user_x, int user_y, int length)
+void simPutBranchLength(int x, int y, int branchLength)
 {
-    Point point = mapCoords(user_x, user_y);
-    writeBuffer[point.y * SIM_X_SIZE + point.x].length = length;
+    Point point = mapCoords(x, y);
+
+    assert(point.x >= 0 && point.x < SIM_X_SIZE);
+    assert(point.y >= 0 && point.y < SIM_Y_SIZE);
+    writeBuffer[point.y * SIM_X_SIZE + point.x].length = branchLength;
+}
+
+void simPutSpring(int x, int y, int argb, int length) {
+    simPutBranchLength(x, y, length);
+    simPutPixel(x, y, argb);
 }
 
 int simGetLength(int user_x, int user_y)
 {
     Point point = mapCoords(user_x, user_y);
+
+    assert(point.x >= 0 && point.x < SIM_X_SIZE);
+    assert(point.y >= 0 && point.y < SIM_Y_SIZE);
     return readBuffer[point.y * SIM_X_SIZE + point.x].length;
 }
 
-int simGetPixel(int user_x, int user_y) {
+int simGetPixel(int x, int y) {
 
-    Point point = mapCoords(user_x, user_y);
+    Point point = mapCoords(x, y);
 
     assert(point.x >= 0 && point.x < SIM_X_SIZE);
     assert(point.y >= 0 && point.y < SIM_Y_SIZE);
     return readBuffer[point.y * SIM_X_SIZE + point.x].color;
-}
-
-
-void simPutSpring(int x, int y, int argb, int length) {
-    simPutLength(x, y, length);
-    simPutPixel(x, y, argb);
 }
 
 static int makeColor(Color color)
@@ -214,19 +220,19 @@ int simMakeBrighter(int argb, int k)
     return makeColor(color);
 }
 
-int simMixColors(int lhs, int rhs, int lhs_weigth, int rhs_weight)
+int simMixColors(int lhs, int rhs, int lhsWeight, int rhsWight)
 {
-    Color lhs_color = hexToColor(lhs);
-    Color rhs_color = hexToColor(rhs);
-    float mix_rate = ((float) lhs_weigth) / (lhs_weigth + rhs_weight);
+    Color lhsColor = hexToColor(lhs);
+    Color rhsColor = hexToColor(rhs);
+    float mixRate = ((float) lhsWeight) / (lhsWeight + rhsWight);
 
-    Color mix_color;
-    mix_color.a = lhs_color.a;
-    mix_color.r = mix_rate * lhs_color.r + (1 - mix_rate) * rhs_color.r;
-    mix_color.g = mix_rate * lhs_color.g + (1 - mix_rate) * rhs_color.g;
-    mix_color.b = mix_rate * lhs_color.b + (1 - mix_rate) * rhs_color.b;
+    Color mixColor;
+    mixColor.a = lhsColor.a;
+    mixColor.r = mixRate * lhsColor.r + (1 - mixRate) * rhsColor.r;
+    mixColor.g = mixRate * lhsColor.g + (1 - mixRate) * rhsColor.g;
+    mixColor.b = mixRate * lhsColor.b + (1 - mixRate) * rhsColor.b;
 
-    return makeColor(mix_color);
+    return makeColor(mixColor);
 }
 
 int simRand(int from, int to)

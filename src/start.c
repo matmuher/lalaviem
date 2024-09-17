@@ -2,8 +2,8 @@
 
 int main(void)
 {
-     simInit();
-     app();
-     simExit();
+    simInit();
+    app();
+    simExit();
     return 0;
 }
