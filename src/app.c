@@ -1,6 +1,6 @@
 #include "sim.h"
 
-#define STEPS 400
+#define STEPS 10
 
 void app()
 {

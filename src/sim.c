@@ -28,6 +28,8 @@ void simInit()
     simFlush();
 }
 
+void closeLogs();
+
 static void processEvents()
 {
     SDL_Event event;
@@ -35,6 +37,7 @@ static void processEvents()
 
     if (event.type == SDL_KEYDOWN &&
         event.key.keysym.sym == SDLK_ESCAPE) {
+        closeLogs();
         SDL_DestroyRenderer(Renderer);
         SDL_DestroyWindow(Window);
         SDL_Quit();
