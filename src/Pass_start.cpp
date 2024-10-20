@@ -97,22 +97,35 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
         for (auto &I : B) {
           // Value *valueAddr = ConstantInt::get(builder.getInt64Ty(), (int64_t)(&I));
           outs() << "cur instr: " << I.getOpcodeName() << '\n';
-           if (auto *call = dyn_cast<CallInst>(&I)) {
+
+          if (auto *call = dyn_cast<PHINode>(&I)) {
+            continue;
+          }
+
+          if (auto *call = dyn_cast<CallInst>(&I)) {
             Function *callee = call->getCalledFunction();
             outs() << callee->getName() << '\n';
             
-            if (callee && isFuncLogger(callee->getName())) {
+            if(callee->getName().startswith("llvm")) {
               continue;
             }
 
+            if (callee && isFuncLogger(callee->getName())) {
+              continue;
+            } else {
+              builder.SetInsertPoint(&I);
+              Value *opName = builder.CreateGlobalStringPtr(callee->getName());
+              Value *args[] = {opName};
+              builder.CreateCall(optLogFunc, args);
+            }
 
-          }
+            continue;
+        }
 
-            builder.SetInsertPoint(&I);
-            // builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
-            Value *opName = builder.CreateGlobalStringPtr(I.getOpcodeName());
-            Value *args[] = {opName};
-            builder.CreateCall(optLogFunc, args);
+          builder.SetInsertPoint(&I);
+          Value *opName = builder.CreateGlobalStringPtr(I.getOpcodeName());
+          Value *args[] = {opName};
+          builder.CreateCall(optLogFunc, args);
 
           // // Insert a call to binOptLogFunc function
           // Value *lhs = op->getOperand(0);

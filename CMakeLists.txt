@@ -15,13 +15,15 @@ if(NOT LLVM_FOUND)
   return()
 endif()
 
+set(CMAKE_BUILD_TYPE "Release")
+
 include_directories(${CMAKE_SOURCE_DIR}/src
                     ${LLVM_INCLUDE_DIR}
                     ${SDL2_INCLUDE_DIRS}
                     "/usr/lib/llvm-14/include"
                     )
 
-add_compile_options(-Wall -fPIC)
+add_compile_options(-Wall -fPIC -O2)
 
 set(PASS_LIB src/Pass_start.cpp)
 add_library(Pass SHARED ${PASS_LIB})

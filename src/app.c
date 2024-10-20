@@ -1,11 +1,13 @@
 #include "sim.h"
 
-#define STEPS 10
+#define STEPS 200
 
 void app()
 {
     simPutSpring(10, 2, GREEN, 1);
+    simPutSpring(25, 20, GREEN, 1);
     simPutSpring(50, 30, GREEN, 1);
+    simPutSpring(75, 50, GREEN, 1);
     simPutSpring(100, 10, GREEN, 1);
     simFlush();
 
@@ -16,7 +18,7 @@ void app()
             int curLen = simGetLength(x, y);
 
             if (curValue == GREEN &&  curLen > 0) {
-                simPutPixel(x, y, BRANCH);
+                // simPutPixel(x, y, BRANCH);
 
                 int dx = simRand(-1, 1);
                 int dy = simRand(1, 1);
