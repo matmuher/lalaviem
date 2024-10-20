@@ -17,8 +17,11 @@ static SDL_Renderer *Renderer = NULL;
 static SDL_Window *Window = NULL;
 static Uint32 Ticks = 0;
 
+void initLogs();
+
 void simInit()
 {
+    initLogs();
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(SIM_X_SIZE * CELL_SIZE, SIM_Y_SIZE * CELL_SIZE,
         0, &Window, &Renderer);
