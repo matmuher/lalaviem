@@ -6,7 +6,9 @@ target triple = "x86_64-pc-linux-gnu"
 ; Function Attrs: nounwind uwtable
 define dso_local void @app() local_unnamed_addr #0 {
   tail call void @simPutSpring(i32 noundef 10, i32 noundef 2, i32 noundef -16711936, i32 noundef 1) #2
+  tail call void @simPutSpring(i32 noundef 25, i32 noundef 20, i32 noundef -16711936, i32 noundef 1) #2
   tail call void @simPutSpring(i32 noundef 50, i32 noundef 30, i32 noundef -16711936, i32 noundef 1) #2
+  tail call void @simPutSpring(i32 noundef 75, i32 noundef 50, i32 noundef -16711936, i32 noundef 1) #2
   tail call void @simPutSpring(i32 noundef 100, i32 noundef 10, i32 noundef -16711936, i32 noundef 1) #2
   tail call void (...) @simFlush() #2
   br label %1
@@ -26,7 +28,7 @@ define dso_local void @app() local_unnamed_addr #0 {
 7:                                                ; preds = %10
   tail call void (...) @simFlush() #2
   %8 = add nuw nsw i32 %2, 1
-  %9 = icmp eq i32 %8, 400
+  %9 = icmp eq i32 %8, 200
   br i1 %9, label %3, label %1, !llvm.loop !5
 
 10:                                               ; preds = %32
@@ -44,7 +46,6 @@ define dso_local void @app() local_unnamed_addr #0 {
   br i1 %19, label %20, label %32
 
 20:                                               ; preds = %13
-  tail call void @simPutPixel(i32 noundef %14, i32 noundef %5, i32 noundef -3308225) #2
   %21 = tail call i32 @simRand(i32 noundef -1, i32 noundef 1) #2
   %22 = tail call i32 @simRand(i32 noundef 1, i32 noundef 1) #2
   %23 = mul nsw i32 %21, %16
@@ -74,9 +75,9 @@ declare i32 @simGetPixel(i32 noundef, i32 noundef) local_unnamed_addr #1
 
 declare i32 @simGetLength(i32 noundef, i32 noundef) local_unnamed_addr #1
 
-declare void @simPutPixel(i32 noundef, i32 noundef, i32 noundef) local_unnamed_addr #1
-
 declare i32 @simRand(i32 noundef, i32 noundef) local_unnamed_addr #1
+
+declare void @simPutPixel(i32 noundef, i32 noundef, i32 noundef) local_unnamed_addr #1
 
 declare i32 @simMixColors(i32 noundef, i32 noundef, i32 noundef, i32 noundef) local_unnamed_addr #1
 
